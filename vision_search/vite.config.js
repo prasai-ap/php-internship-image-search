@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: ['resources/css/capturestyle.css', 'resources/js/capturefunction.js'],
             refresh: true,
         }),
         tailwindcss(),
