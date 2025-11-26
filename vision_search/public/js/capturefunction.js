@@ -1,48 +1,70 @@
 let capturedFile = null;
 
-
 navigator.mediaDevices.getUserMedia({ video: true })
     .then(stream => {
         document.getElementById("camera").srcObject = stream;
-    });
-
+    })
+    .catch(err => console.error("Camera error:", err));
 
 function capture() {
     const video = document.getElementById("camera");
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
+    const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    ctx.drawImage(video, 0, 0);
+    canvas.getContext("2d").drawImage(video, 0, 0);
 
     canvas.toBlob(blob => {
-        capturedFile = new File([blob], "captured.jpg", { type: "image/jpeg" });
-        alert("Image captured successfully!");
+        capturedFile = new File([blob], "capture.jpg", { type: "image/jpeg" });
+        const preview = document.getElementById("preview");
+        preview.src = URL.createObjectURL(capturedFile);
+        preview.style.display = "block";
     }, "image/jpeg");
 }
 
-function sendImage() {
-    let fileInput = document.getElementById("fileUpload");
-    let file = capturedFile ? capturedFile : fileInput.files[0];
+document.getElementById("fileUpload").addEventListener("change", function () {
+    if (this.files && this.files[0]) {
+        capturedFile = this.files[0];
+        const uploadPreview = document.getElementById("uploadPreview");
+        uploadPreview.src = URL.createObjectURL(capturedFile);
+        uploadPreview.style.display = "block";
+    }
+});
 
-    if (!file) {
-        alert("Please capture or upload an image.");
+function sendImage() {
+    if (!capturedFile) {
+        alert("Please capture or upload an image first.");
         return;
     }
 
-    let formData = new FormData();
-    formData.append("image", file);
+    const formData = new FormData();
+    formData.append("file", capturedFile);
 
-    fetch("/api/identify", {
+    fetch("http://127.0.0.1:8000/api/identify", {
         method: "POST",
-        body: formData
+        body: formData,
     })
-    .then(res => res.json())
-    .then(data => {
-        console.log("Server Response:", data);
-        alert("Detection complete — check console.");
-    })
-    .catch(err => console.error("Error:", err));
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById("detectedList");
+            list.innerHTML = "";
+
+            if (data.success) {
+                const objects = data.detected_objects.categories || data.detected_objects;
+
+                for (const [label, confidence] of Object.entries(objects)) {
+                    const li = document.createElement("li");
+                    li.textContent = `${label} - Confidence: ${confidence.toFixed(2)}`;
+                    list.appendChild(li);
+                }
+            } else {
+                const li = document.createElement("li");
+                li.textContent = "Detection failed: " + (data.message || "Unknown error");
+                list.appendChild(li);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error sending image.");
+        });
 }

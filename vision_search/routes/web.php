@@ -8,6 +8,4 @@ Route::get('/', function () {
 
 Route::get('/capture', function () {
     return view('capture');
-}
-);
-
+});
