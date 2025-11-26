@@ -22,7 +22,7 @@
 
 <div class="container mx-auto p-6">
     <div class="text-center mb-10">
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2 animate-bounce">Vision Search</h1>
+        <a href="{{ url('/') }}"><h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2 animate-bounce">Vision Search</h1></a>
         <p class="text-gray-600 text-lg md:text-xl">Capture or upload an image to find matching products instantly.</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
