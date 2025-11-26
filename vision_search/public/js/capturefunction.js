@@ -21,7 +21,8 @@ function capture() {
         preview.src = URL.createObjectURL(capturedFile);
         preview.classList.remove("hidden");
 
-        // Automatically detect after capture
+        // Show products section and trigger detection
+        document.getElementById("productsSection").classList.remove("hidden");
         sendImage(1);
     }, "image/jpeg");
 }
@@ -33,7 +34,8 @@ document.getElementById("fileUpload").addEventListener("change", function () {
         uploadPreview.src = URL.createObjectURL(capturedFile);
         uploadPreview.classList.remove("hidden");
 
-        // Automatically detect after upload
+        // Show products section and trigger detection
+        document.getElementById("productsSection").classList.remove("hidden");
         sendImage(1);
     }
 });
@@ -60,52 +62,47 @@ function sendImage(page = 1) {
         const list = document.getElementById("detectedList");
         list.innerHTML = "";
 
-        if (data.success) {
-            if (data.products && data.products.length > 0) {
-                data.products.forEach(product => {
-                    const div = document.createElement("div");
-                    div.className = "bg-gray-50 p-4 rounded-lg shadow hover:shadow-lg transition transform hover:-translate-y-1";
-                    div.innerHTML = `
-                        <img src="${getImageSrc(product.prod_image)}" class="w-full h-48 object-cover rounded mb-2">
-                        <h3 class="text-lg font-semibold">${product.prod_name}</h3>
-                        <p class="text-gray-600">${product.parent_category_name}</p>
-                    `;
-                    list.appendChild(div);
-                });
+        if (data.success && data.products && data.products.length > 0) {
+            data.products.forEach(product => {
+                const div = document.createElement("div");
+                div.className = "bg-gray-50 p-4 rounded-lg shadow hover:shadow-lg transition transform hover:-translate-y-1 fade-in";
+                div.innerHTML = `
+                    <img src="${getImageSrc(product.prod_image)}" class="w-full h-48 object-cover rounded mb-2">
+                    <h3 class="text-lg font-semibold">${product.prod_name}</h3>
+                    <p class="text-gray-600">${product.parent_category_name}</p>
+                `;
+                list.appendChild(div);
+            });
 
-                // Pagination
-                if (data.pagination) {
-                    currentPage = data.pagination.current_page;
-                    lastPage = data.pagination.last_page;
+            // Pagination
+            if (data.pagination) {
+                currentPage = data.pagination.current_page;
+                lastPage = data.pagination.last_page;
 
-                    const paginationDiv = document.createElement("div");
-                    paginationDiv.className = "col-span-full flex justify-center space-x-4 mt-6";
+                const paginationDiv = document.createElement("div");
+                paginationDiv.className = "col-span-full flex justify-center space-x-4 mt-6";
 
-                    if (currentPage > 1) {
-                        const prevBtn = document.createElement("button");
-                        prevBtn.textContent = "Previous";
-                        prevBtn.className = "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition";
-                        prevBtn.onclick = () => sendImage(currentPage - 1);
-                        paginationDiv.appendChild(prevBtn);
-                    }
-
-                    if (currentPage < lastPage) {
-                        const nextBtn = document.createElement("button");
-                        nextBtn.textContent = "Next";
-                        nextBtn.className = "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition";
-                        nextBtn.onclick = () => sendImage(currentPage + 1);
-                        paginationDiv.appendChild(nextBtn);
-                    }
-
-                    list.appendChild(paginationDiv);
+                if (currentPage > 1) {
+                    const prevBtn = document.createElement("button");
+                    prevBtn.textContent = "Previous";
+                    prevBtn.className = "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition";
+                    prevBtn.onclick = () => sendImage(currentPage - 1);
+                    paginationDiv.appendChild(prevBtn);
                 }
 
-            } else {
-                list.innerHTML = '<p class="col-span-full text-center text-gray-500">No matching products found.</p>';
+                if (currentPage < lastPage) {
+                    const nextBtn = document.createElement("button");
+                    nextBtn.textContent = "Next";
+                    nextBtn.className = "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition";
+                    nextBtn.onclick = () => sendImage(currentPage + 1);
+                    paginationDiv.appendChild(nextBtn);
+                }
+
+                list.appendChild(paginationDiv);
             }
 
         } else {
-            list.innerHTML = `<p class="col-span-full text-center text-red-500">Detection failed: ${data.message || "Unknown error"}</p>`;
+            list.innerHTML = '<p class="col-span-full text-center text-gray-500">No matching products found.</p>';
         }
     })
     .catch(err => {
