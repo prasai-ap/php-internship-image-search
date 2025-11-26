@@ -80,7 +80,7 @@ function sendImage(page = 1) {
                 lastPage = data.pagination.last_page;
 
                 const paginationDiv = document.createElement("div");
-                paginationDiv.className = "col-span-full flex justify-center space-x-4 mt-6";
+                paginationDiv.className = "col-span-full flex justify-center items-center space-x-4 mt-6";
 
                 if (currentPage > 1) {
                     const prevBtn = document.createElement("button");
@@ -89,6 +89,11 @@ function sendImage(page = 1) {
                     prevBtn.onclick = () => sendImage(currentPage - 1);
                     paginationDiv.appendChild(prevBtn);
                 }
+
+                const pageInfo = document.createElement("span");
+                pageInfo.textContent = `Page ${currentPage} of ${lastPage}`;
+                pageInfo.className = "text-gray-700 font-semibold";
+                paginationDiv.appendChild(pageInfo);
 
                 if (currentPage < lastPage) {
                     const nextBtn = document.createElement("button");
