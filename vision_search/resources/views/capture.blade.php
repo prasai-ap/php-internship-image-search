@@ -31,7 +31,7 @@
             <img id="preview" class="mx-auto rounded-lg w-64 h-64 object-cover mb-4 hidden border-2 border-gray-200">
             <button onclick="capture()" 
                 class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition transform hover:-translate-y-1 hover:scale-105">
-                Capture Image
+                Search
             </button>
         </div>
 
